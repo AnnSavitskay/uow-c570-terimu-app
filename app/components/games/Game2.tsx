@@ -1,4 +1,5 @@
 import { useState, useEffect, forwardRef } from "react";
+import { useNavigate, useSearchParams } from "react-router";
 import {
   DndContext,
   pointerWithin,
@@ -182,20 +183,25 @@ const CardPool = ({ cardPool }: { cardPool: StoryEvent[] }) => {
 };
 
 interface Game2Props {
-  onGameComplete: () => void;
+  redirectUrl?: string;
 }
 
-export default function Game2({ onGameComplete }: Game2Props) {
+export default function Game2({ redirectUrl }: Game2Props) {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Get redirect URL from search params or use the prop
+  const redirect = redirectUrl || searchParams.get("redirect") || "/story";
   // Correct order of events
   const correctOrder: StoryEvent[] = [
-    { id: 1, text: "Tamatea, paddled up the river in his waka Tuwhenua", img: "/img/p7.png" },
-    { id: 2, text: "The forest is pollluted and damaged, ", img: "/img/p15.png" },
-    { id: 3, text: "Aroha sees a log floating upstream", img: "/img/p10.png" },
-    { id: 4, text: "The log turns toward Aroha and she screams", img: "/img/p12.png" },
-    { id: 5, text: "Te Rimu pleads for help with the polluted river", img: "/img/p14.png" },
-    { id: 6, text: "Tawa is called to help clean the river", img: "/img/p16.png" },
-    { id: 7, text: "The people work to restore the river", img: "/img/p18.png" },
-    { id: 8, text: "Te Rimu continues to watch over the clean river", img: "/img/p19.png" },
+    { id: 1, text: "Tamatea, paddled up the river in his waka Tuwhenua", img: "/img/p5.png" },
+    { id: 2, text: "The forest is pollluted and damaged, ", img: "/img/p11.png" },
+    { id: 3, text: "Aroha sees a log floating upstream", img: "/img/p7.png" },
+    { id: 4, text: "The log turns toward Aroha and she screams", img: "/img/p8.png" },
+    { id: 5, text: "Te Rimu pleads for help with the polluted river", img: "/img/p10.png" },
+    { id: 6, text: "Tawa is called to help clean the river", img: "/img/p12.png" },
+    { id: 7, text: "The people work to restore the river", img: "/img/p13.png" },
+    { id: 8, text: "Te Rimu continues to watch over the clean river", img: "/img/p16.png" },
   ];
 
   // State for the 8 slots at the top (initially all empty)
@@ -373,7 +379,11 @@ export default function Game2({ onGameComplete }: Game2Props) {
   };
 
   const handleContinue = () => {
-    onGameComplete();
+    navigate(redirect);
+  };
+
+  const handleGiveUp = () => {
+    navigate(redirect);
   };
 
   // Render static version during SSR and hydration
@@ -381,9 +391,19 @@ export default function Game2({ onGameComplete }: Game2Props) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100 p-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
-            Arrange the Te Rimu Story in the Correct Order
-          </h2>
+          <div className="flex items-center justify-between mb-8">
+            <Button
+              variant="outline"
+              onClick={handleGiveUp}
+              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+            >
+              Give Up & Continue
+            </Button>
+            <h2 className="text-3xl font-bold text-center text-gray-800">
+              Arrange the Te Rimu Story in the Correct Order
+            </h2>
+            <div className="w-[140px]" /> {/* Spacer for centering */}
+          </div>
 
           {/* Empty slots at top */}
           <div className="mb-8">
@@ -454,9 +474,19 @@ export default function Game2({ onGameComplete }: Game2Props) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100 p-6">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
-          Arrange the Te Rimu Story in the Correct Order
-        </h2>
+        <div className="flex items-center justify-between mb-8">
+          <Button
+            variant="outline"
+            onClick={handleGiveUp}
+            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+          >
+            Give Up & Continue
+          </Button>
+          <h2 className="text-3xl font-bold text-center text-gray-800">
+            Arrange the Te Rimu Story in the Correct Order
+          </h2>
+          <div className="w-[140px]" /> {/* Spacer for centering */}
+        </div>
 
         <DndContext
           sensors={sensors}

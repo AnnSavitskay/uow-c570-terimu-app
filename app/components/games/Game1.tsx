@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router";
 import { Card } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 
@@ -35,14 +36,19 @@ const ICONS: Record<SceneItem["id"], string> = {
 };
 
 interface Game1Props {
-  onGameComplete: () => void;
+  redirectUrl?: string;
 }
 
-export default function Game1({ onGameComplete }: Game1Props) {
+export default function Game1({ redirectUrl }: Game1Props) {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [selected, setSelected] = useState<SceneItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [gameCompleted, setGameCompleted] = useState(false);
+
+  // Get redirect URL from search params or use the prop
+  const redirect = redirectUrl || searchParams.get("redirect") || "/story";
 
   const handleItemSelect = (item: SceneItem) => {
     setSelected(item);
@@ -52,23 +58,37 @@ export default function Game1({ onGameComplete }: Game1Props) {
   };
 
   const handleContinue = () => {
-    onGameComplete();
+    navigate(redirect);
+  };
+
+  const handleGiveUp = () => {
+    navigate(redirect);
   };
 
   return (
-    <div className="min-h-dvh h-dvh p-4 bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100">
+    <div className="h-full">
       <div className="max-w-4xl mx-auto flex flex-col gap-4">
-        <div className="flex items-center justify-center gap-2">
-          <h1 className="text-2xl md:text-3xl font-bold text-center">Find Te Rimu</h1>
+        <div className="flex items-center justify-between">
           <Button
-            aria-label="How to play"
             variant="outline"
-            size="icon"
-            className="size-8 rounded-full"
-            onClick={() => setShowHelp(true)}
+            onClick={handleGiveUp}
+            className="text-red-600 hover:text-red-700 hover:bg-red-50"
           >
-            ?
+            Give Up & Continue
           </Button>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl md:text-3xl font-bold text-center">Find Te Rimu</h1>
+            <Button
+              aria-label="How to play"
+              variant="outline"
+              size="icon"
+              className="size-8 rounded-full"
+              onClick={() => setShowHelp(true)}
+            >
+              ?
+            </Button>
+          </div>
+          <div className="w-[140px]" /> {/* Spacer for centering */}
         </div>
         <div className="relative w-full aspect-[4/3] overflow-hidden rounded-xl shadow-2xl">
           <img src={scene.background} alt="River scene" className="object-cover object-bottom w-full h-full" />

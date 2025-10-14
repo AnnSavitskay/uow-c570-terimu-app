@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router";
 import { Button } from "~/components/ui/button";
 
 const cardImages = [
@@ -13,10 +14,15 @@ const cardImages = [
 ];
 
 interface Game3Props {
-  onGameComplete: () => void;
+  redirectUrl?: string;
 }
 
-export default function Game3({ onGameComplete }: Game3Props) {
+export default function Game3({ redirectUrl }: Game3Props) {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Get redirect URL from search params or use the prop
+  const redirect = redirectUrl || searchParams.get("redirect") || "/story";
   const [cards, setCards] = useState<{ src: string; matched: boolean }[]>([]);
   const [firstChoice, setFirstChoice] = useState<any>(null);
   const [secondChoice, setSecondChoice] = useState<any>(null);
@@ -77,13 +83,27 @@ export default function Game3({ onGameComplete }: Game3Props) {
   };
 
   const handleContinue = () => {
-    onGameComplete();
+    navigate(redirect);
+  };
+
+  const handleGiveUp = () => {
+    navigate(redirect);
   };
 
   return (
     <div className="min-h-dvh flex items-center justify-center bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100 p-4">
-      <div className="flex flex-col items-center p-0">
-        <h1 className="text-2xl font-bold mb-4">Matching Game</h1>
+      <div className="flex flex-col items-center p-0 w-full max-w-4xl">
+        <div className="flex items-center justify-between w-full mb-4">
+          <Button
+            variant="outline"
+            onClick={handleGiveUp}
+            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+          >
+            Give Up & Continue
+          </Button>
+          <h1 className="text-2xl font-bold">Matching Game</h1>
+          <div className="w-[140px]" /> {/* Spacer for centering */}
+        </div>
 
         <div className="grid grid-cols-4 sm:grid-cols-4 gap-2 sm:gap-4">
           {cards.map((card, index) => {
